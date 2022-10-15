@@ -178,7 +178,7 @@ func TestOrder_Split(t *testing.T) {
 
 			ctrl := gomock.NewController(t)
 			mockStorage := mock.NewMockOrderStorage(ctrl)
-			mockStorage.EXPECT().Order(gomock.Any(), gomock.Any()).Return(tt.order)
+			mockStorage.EXPECT().Order(gomock.Any(), gomock.Any()).Return(&tt.order).AnyTimes()
 
 			svc := NewOrderService(mockStorage)
 

@@ -54,7 +54,7 @@ func dishSplit(o *storage.Order) []storage.Bill {
 		billsByUser[dish.PersonID] = bill
 	}
 
-	bills := make([]storage.Bill, len(billsByUser))
+	bills := make([]storage.Bill, 0)
 
 	for _, b := range billsByUser {
 		bills = append(bills, b)
@@ -84,7 +84,7 @@ func dishSplitEqual(o *storage.Order) []storage.Bill {
 		billsByUser[dish.PersonID] = bill
 	}
 
-	bills := make([]storage.Bill, o.PersonCount)
+	bills := make([]storage.Bill, 0)
 
 	for _, b := range billsByUser {
 		bills = append(bills, b)
