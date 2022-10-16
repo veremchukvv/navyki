@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"funny_test/storage"
+	"sort"
 )
 
 type OrderStorage interface {
@@ -60,6 +61,10 @@ func dishSplit(o *storage.Order) []storage.Bill {
 		bills = append(bills, b)
 	}
 
+	sort.Slice(bills, func(i, j int) (less bool) {
+		return bills[i].PersonID < bills[j].PersonID
+	})
+
 	return bills
 }
 
@@ -89,6 +94,10 @@ func dishSplitEqual(o *storage.Order) []storage.Bill {
 	for _, b := range billsByUser {
 		bills = append(bills, b)
 	}
+
+	sort.Slice(bills, func(i, j int) (less bool) {
+		return bills[i].PersonID < bills[j].PersonID
+	})
 
 	//добавляем дробную часть от суммы в счёт последнему гостю
 	bills[len(bills)-1].Amount += change

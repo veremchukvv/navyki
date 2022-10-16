@@ -182,7 +182,7 @@ func TestOrder_Split(t *testing.T) {
 
 			svc := NewOrderService(mockStorage)
 
-			svc.Split(context.Background(), tt.order.ID, tt.splitType)
+			// svc.Split(context.Background(), tt.order.ID, tt.splitType)
 
 			// execute method
 			bills := svc.Split(context.Background(), tt.order.ID, tt.splitType)
