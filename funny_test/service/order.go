@@ -34,11 +34,17 @@ func simpleSplit(o *storage.Order) []storage.Bill {
 		amount = amount + dish.Price
 	}
 
+	nds := (amount * 20) / 100
+	taxFraction := (amount * 20) % 100
+	tax := strconv.FormatInt(nds, 10) + "," + strconv.FormatInt(taxFraction, 10)
+
 	return []storage.Bill{{
 		ID:       0,
 		PersonID: 0,
 		Amount:   amount,
+		Tax:      tax,
 	}}
+
 }
 
 func dishSplit(o *storage.Order) []storage.Bill {
@@ -67,6 +73,12 @@ func dishSplit(o *storage.Order) []storage.Bill {
 	sort.Slice(bills, func(i, j int) (less bool) {
 		return bills[i].PersonID < bills[j].PersonID
 	})
+
+	for i := range billsByUser {
+		taxFraction := ((bills[i-1].Amount) * 20) % 100
+		nds := ((bills[i-1].Amount) * 20) / 100
+		bills[i-1].Tax = strconv.FormatInt(nds, 10) + "," + strconv.FormatInt(taxFraction, 10)
+	}
 
 	return bills
 }
@@ -132,11 +144,11 @@ func dishSplitEqual(o *storage.Order) []storage.Bill {
 	// добавляем в счёт последнему гостю информацию о размере скидки (для учёта в бухгалтерии)
 	bills[len(bills)-1].Discount += discount
 
-	TaxFraction := ((bills[1].Amount) * 20) % 100
+	taxFraction := ((bills[1].Amount) * 20) % 100
 
 	for i := range billsByUser {
-		NDS := ((bills[i-1].Amount) * 20) / 100
-		bills[i-1].Tax = strconv.FormatInt(NDS, 10) + "," + strconv.FormatInt(TaxFraction, 10)
+		nds := ((bills[i-1].Amount) * 20) / 100
+		bills[i-1].Tax = strconv.FormatInt(nds, 10) + "," + strconv.FormatInt(taxFraction, 10)
 	}
 
 	return bills
