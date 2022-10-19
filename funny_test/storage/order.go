@@ -4,7 +4,7 @@ package storage
 type Dish struct {
 	ID       int
 	Name     string
-	Price    int
+	Price    int64
 	PersonID int
 }
 
@@ -14,13 +14,14 @@ type Order struct {
 	// блюда которые заказали
 	Dishes []Dish
 	// количество гостей
-	PersonCount int
+	PersonCount int64
 }
 
 // Счет
 type Bill struct {
 	ID       int
 	PersonID int
-	Amount   int
-	Discount int
+	Amount   int64
+	Discount int64
+	Tax      string
 }

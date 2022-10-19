@@ -4,6 +4,7 @@ import (
 	"context"
 	"funny_test/storage"
 	"sort"
+	"strconv"
 )
 
 type OrderStorage interface {
@@ -28,7 +29,7 @@ const (
 )
 
 func simpleSplit(o *storage.Order) []storage.Bill {
-	amount := 0
+	var amount int64
 	for _, dish := range o.Dishes {
 		amount = amount + dish.Price
 	}
@@ -73,7 +74,7 @@ func dishSplit(o *storage.Order) []storage.Bill {
 func dishSplitEqual(o *storage.Order) []storage.Bill {
 	billsByUser := make(map[int]storage.Bill)
 
-	amount := 0
+	var amount int64
 
 	for _, dish := range o.Dishes {
 		amount = amount + dish.Price
@@ -104,11 +105,11 @@ func dishSplitEqual(o *storage.Order) []storage.Bill {
 	fraction := amount % o.PersonCount
 
 	//объявляем нулевую скидку
-	discount := 0
+	var discount int64
 
 	//добиваемся деления общей суммы счёта на количество гостей без остатка и считаем размер скидки
 	if fraction != 0 {
-		i := 0
+		var i int64
 		for {
 			i++
 			amount -= 1
@@ -130,6 +131,13 @@ func dishSplitEqual(o *storage.Order) []storage.Bill {
 
 	// добавляем в счёт последнему гостю информацию о размере скидки (для учёта в бухгалтерии)
 	bills[len(bills)-1].Discount += discount
+
+	TaxFraction := ((bills[1].Amount) * 20) % 100
+
+	for i := range billsByUser {
+		NDS := ((bills[i-1].Amount) * 20) / 100
+		bills[i-1].Tax = strconv.FormatInt(NDS, 10) + "," + strconv.FormatInt(TaxFraction, 10)
+	}
 
 	return bills
 }
