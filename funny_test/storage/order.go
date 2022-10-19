@@ -22,4 +22,5 @@ type Bill struct {
 	ID       int
 	PersonID int
 	Amount   int
+	Discount int
 }

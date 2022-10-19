@@ -55,12 +55,14 @@ func dishSplit(o *storage.Order) []storage.Bill {
 		billsByUser[dish.PersonID] = bill
 	}
 
+	//создаём массив счетов 0 размера, чтобы избежать добавления пустых счетов
 	bills := make([]storage.Bill, 0)
 
 	for _, b := range billsByUser {
 		bills = append(bills, b)
 	}
 
+	//сортируем список счетов для дальнейших операций
 	sort.Slice(bills, func(i, j int) (less bool) {
 		return bills[i].PersonID < bills[j].PersonID
 	})
@@ -77,30 +79,57 @@ func dishSplitEqual(o *storage.Order) []storage.Bill {
 		amount = amount + dish.Price
 	}
 
-	//считаем дробную часть общей суммы
-	change := amount % o.PersonCount
-
 	for _, dish := range o.Dishes {
 		bill := storage.Bill{}
 
 		bill.ID = dish.PersonID
 		bill.PersonID = dish.PersonID
-		bill.Amount = amount / o.PersonCount
+		// bill.Amount = amount / o.PersonCount
 		billsByUser[dish.PersonID] = bill
 	}
 
+	//создаём массив счетов 0 размера, чтобы избежать добавления пустых счетов
 	bills := make([]storage.Bill, 0)
 
 	for _, b := range billsByUser {
 		bills = append(bills, b)
 	}
 
+	//сортируем список счетов для дальнейших операций
 	sort.Slice(bills, func(i, j int) (less bool) {
 		return bills[i].PersonID < bills[j].PersonID
 	})
 
-	//добавляем дробную часть от суммы в счёт последнему гостю
-	bills[len(bills)-1].Amount += change
+	//считаем дробную часть общей суммы
+	fraction := amount % o.PersonCount
+
+	//объявляем нулевую скидку
+	discount := 0
+
+	//добиваемся деления общей суммы счёта на количество гостей без остатка и считаем размер скидки
+	if fraction != 0 {
+		i := 0
+		for {
+			i++
+			amount -= 1
+			newFraction := amount % o.PersonCount
+			if newFraction == 0 {
+				discount = i
+				break
+			}
+		}
+	}
+
+	// считаем сумму счёта для каждого гостя от общей суммы счёта за вычетом скидки
+	amountForBill := amount / o.PersonCount
+
+	// добавляем в счёт каждому гостю сумму поделённую на количество гостей без остатка
+	for i := range billsByUser {
+		bills[i-1].Amount += amountForBill
+	}
+
+	// добавляем в счёт последнему гостю информацию о размере скидки (для учёта в бухгалтерии)
+	bills[len(bills)-1].Discount += discount
 
 	return bills
 }
